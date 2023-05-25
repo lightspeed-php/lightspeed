@@ -12,5 +12,8 @@
             "email": "jarryd@tilbrooktech.com"
         }
     ],
+    "bin": [
+        "bin/thingy"
+    ],
     "require": {}
 }
