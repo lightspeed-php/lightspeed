@@ -1,0 +1,16 @@
+{
+    "name": "jradtilbrook/thingy-client",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "Jradtilbrook\\ThingyClient\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "jradtilbrook",
+            "email": "jarryd@tilbrooktech.com"
+        }
+    ],
+    "require": {}
+}
