@@ -1,19 +1,33 @@
 {
     "name": "jradtilbrook/thingy-client",
-    "type": "project",
+    "keywords": [
+        "php",
+        "test",
+        "testing",
+        "phpunit",
+        "pest",
+        "unit"
+    ],
     "autoload": {
         "psr-4": {
             "Jradtilbrook\\ThingyClient\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
     "authors": [
         {
-            "name": "jradtilbrook",
+            "name": "Jarryd Tilbrook",
             "email": "jarryd@tilbrooktech.com"
         }
     ],
     "bin": [
         "bin/thingy"
     ],
-    "require": {}
+    "require": {
+        "phpunit/phpunit": "^9.1.4"
+    }
 }
