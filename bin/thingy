@@ -4,7 +4,7 @@
 use GuzzleHttp\Client;
 use PHPUnit\TextUI\Command as TextUICommand;
 use ThingyClient\Providers\NullProvider;
-use ThingyClient\Api;
+use ThingyClient\API;
 use ThingyClient\Command;
 use ThingyClient\Providers\ProviderFactory;
 
