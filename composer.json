@@ -10,7 +10,7 @@
     ],
     "autoload": {
         "psr-4": {
-            "Jradtilbrook\\ThingyClient\\": "src/"
+            "ThingyClient\\": "src/"
         }
     },
     "autoload-dev": {
@@ -28,6 +28,7 @@
         "bin/thingy"
     ],
     "require": {
-        "phpunit/phpunit": "^9.1.4"
+        "phpunit/phpunit": "^9.1.4",
+        "guzzlehttp/guzzle": "^7.7"
     }
 }
