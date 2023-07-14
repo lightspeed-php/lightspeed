@@ -31,7 +31,6 @@ use function sort;
 use function sprintf;
 use function time;
 
-use GuzzleHttp\Client;
 use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\TestResult;
 use PHPUnit\Framework\TestSuite;
@@ -84,8 +83,6 @@ use SebastianBergmann\Comparator\Comparator;
 use SebastianBergmann\Environment\Runtime;
 use SebastianBergmann\Invoker\Invoker;
 use SebastianBergmann\Timer\Timer;
-use Tests\Fixtures\NullProvider;
-use ThingyClient\API;
 use ThingyClient\TestRunner as ThingyClientTestRunner;
 
 /**
@@ -127,6 +124,11 @@ final class TestRunner extends BaseTestRunner
      */
     private $timer;
 
+    /**
+     * @var ThingyClientTestRunner
+     */
+    private $runner;
+
     public function __construct(TestSuiteLoader $loader = null, CodeCoverageFilter $filter = null)
     {
         if ($filter === null) {
@@ -136,6 +138,12 @@ final class TestRunner extends BaseTestRunner
         $this->codeCoverageFilter = $filter;
         $this->loader             = $loader;
         $this->timer              = new Timer;
+    }
+
+    public function setCustomRunner(ThingyClientTestRunner $runner)
+    {
+        $this->runner = $runner;
+        return $this;
     }
 
     /**
@@ -653,18 +661,7 @@ final class TestRunner extends BaseTestRunner
             }
         }
 
-        $client = new Client([
-            'base_uri' => $_SERVER['THINGY_BASE_URL'],
-            'headers' => [
-                'User-Agent' => 'client+php version', // TODO
-                'Authorization' => 'Bearer '. $_SERVER['THINGY_API_TOKEN'],
-                'Accept' => 'application/json',
-            ],
-        ]);
-
-
-        $runner = new ThingyClientTestRunner(new Api($client, new NullProvider((string)random_int(1, PHP_INT_MAX))));
-        $runner->run($suite, $result);
+        $this->runner->run($suite, $result);
 
         foreach ($this->extensions as $extension) {
             if ($extension instanceof AfterLastTestHook) {
