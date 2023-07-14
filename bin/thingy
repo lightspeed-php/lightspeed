@@ -1,1 +1,36 @@
 #!/usr/bin/env php
+<?php
+
+use GuzzleHttp\Client;
+use Tests\Fixtures\NullProvider;
+use ThingyClient\Api;
+use ThingyClient\Command;
+
+(static function () {
+    // Used when this is required using composer.
+    $vendorPath = dirname(__DIR__, 4).'/vendor/autoload.php';
+
+    // Used when maintainers are running tests.
+    $localPath = dirname(__DIR__).'/vendor/autoload.php';
+
+    if (file_exists($vendorPath)) {
+        include_once $vendorPath;
+    } else {
+        include_once $localPath;
+    }
+
+    require_once __DIR__.'/../overrides/TextUI/TestRunner.php';
+
+    $client = new Client([
+        'base_uri' => $_SERVER['THINGY_BASE_URL'],
+        'headers' => [
+            'User-Agent' => 'client+php version', // TODO
+            'Authorization' => 'Bearer '. $_SERVER['THINGY_API_TOKEN'],
+            'Accept' => 'application/json',
+        ],
+    ]);
+
+    $command = new Command(new Api($client, new NullProvider((string)random_int(1, PHP_INT_MAX))));
+
+    $command->run($_SERVER['argv']);
+})();
