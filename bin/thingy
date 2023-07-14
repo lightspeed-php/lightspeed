@@ -22,6 +22,7 @@ use ThingyClient\Providers\ProviderFactory;
     }
 
     $provider = ProviderFactory::resolveProvider();
+    $provider = new NullProvider('laravel-9-demo');
 
     // if no provider is found, we aren't running in CI so run as vanilla phpunit
     if ($provider === false) {
