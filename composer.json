@@ -29,6 +29,6 @@
     ],
     "require": {
         "phpunit/phpunit": "^9.1.4",
-        "guzzlehttp/guzzle": "^7.7"
+        "guzzlehttp/guzzle": "^6.0"
     }
 }
