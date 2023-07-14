@@ -2,9 +2,11 @@
 <?php
 
 use GuzzleHttp\Client;
+use PHPUnit\TextUI\Command as TextUICommand;
 use ThingyClient\Providers\NullProvider;
 use ThingyClient\Api;
 use ThingyClient\Command;
+use ThingyClient\Providers\ProviderFactory;
 
 (static function () {
     // Used when this is required using composer.
@@ -19,6 +21,15 @@ use ThingyClient\Command;
         include_once $localPath;
     }
 
+    $provider = ProviderFactory::resolveProvider();
+
+    // if no provider is found, we aren't running in CI so run as vanilla phpunit
+    if ($provider === false) {
+        $command = new TextUICommand();
+        $command->run($_SERVER['argv']);
+        return;
+    }
+
     require_once __DIR__.'/../overrides/TextUI/TestRunner.php';
 
     $client = new Client([
@@ -30,7 +41,7 @@ use ThingyClient\Command;
         ],
     ]);
 
-    $command = new Command(new Api($client, new NullProvider((string)random_int(1, PHP_INT_MAX))));
+    $command = new Command(new Api($client, $provider));
 
     $command->run($_SERVER['argv']);
 })();
