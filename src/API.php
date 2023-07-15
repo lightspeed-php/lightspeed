@@ -39,7 +39,6 @@ class API
         curl_setopt_array($this->curl, $opts);
 
         $body = curl_exec($this->curl);
-        throw new Exception(json_encode(curl_getinfo($this->curl)));
 
         $this->handleErrors();
 
