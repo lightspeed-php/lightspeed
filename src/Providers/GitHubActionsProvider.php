@@ -6,7 +6,7 @@ class GitHubActionsProvider implements Provider
 {
     public function branch()
     {
-        return $_SERVER['GITHUB_HEAD_REF'];
+        return $_SERVER['GITHUB_REF_NAME'];
     }
 
     public function buildID()
