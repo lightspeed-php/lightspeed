@@ -1,13 +1,26 @@
 {
-    "name": "jradtilbrook/thingy-client",
+    "name": "lightspeedphp/lightspeed",
+    "description": "Run tests faster by splitting them across nodes.",
     "keywords": [
         "php",
+        "framework",
         "test",
         "testing",
-        "phpunit",
         "pest",
         "unit"
     ],
+    "license": "BSD-4-Clause",
+    "authors": [
+        {
+            "name": "Jarryd Tilbrook",
+            "email": "jarryd@tilbrooktech.com"
+        }
+    ],
+    "require": {
+        "php": "^7.3 || ^8.0",
+        "phpunit/phpunit": "^9.1.4",
+        "ext-curl": "*"
+    },
     "autoload": {
         "psr-4": {
             "ThingyClient\\": "src/"
@@ -18,17 +31,13 @@
             "Tests\\": "tests/"
         }
     },
-    "authors": [
-        {
-            "name": "Jarryd Tilbrook",
-            "email": "jarryd@tilbrooktech.com"
-        }
-    ],
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "config": {
+        "sort-packages": true,
+        "preferred-install": "dist"
+    },
     "bin": [
         "bin/thingy"
-    ],
-    "require": {
-        "phpunit/phpunit": "^9.1.4",
-        "ext-curl": "*"
-    }
+    ]
 }
