@@ -4,21 +4,20 @@ namespace ThingyClient;
 
 use CurlHandle;
 use Exception;
-use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use ThingyClient\Providers\Provider;
 
 class API
 {
-    protected Client $client;
     protected Provider $provider;
     protected CurlHandle $curl;
+    protected array $opts;
 
-    public function __construct(Client $client, Provider $provider)
+    public function __construct(Provider $provider, array $opts)
     {
-        $this->client = $client;
         $this->provider = $provider;
-        $this->curl = curl_init($_SERVER['THINGY_BASE_URL']);
+        $this->curl = curl_init($opts['url']);
+        $this->opts = $opts;
     }
 
     /**
@@ -32,50 +31,27 @@ class API
      */
     public function connect()
     {
-        try {
-            curl_reset($this->curl);
-            curl_setopt($this->curl, CURLOPT_URL, $_SERVER['THINGY_BASE_URL'].'/api/v1/connect');
-            curl_setopt($this->curl, CURLOPT_POST, true);
-            curl_setopt($this->curl, CURLOPT_POSTFIELDS, json_encode([
-                'node_index' => $this->provider->nodeIndex(),
-                'build_id' => $this->provider->buildID(),
-            ]));
-            curl_setopt($this->curl, CURLOPT_HTTPHEADER, ['Content-Type:application/json', 'Authorization:Bearer '.$_SERVER['THINGY_API_TOKEN'], 'Accept:application/json']);
-            curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, true );
-            $body = curl_exec($this->curl);
-            curl_close($this->curl);
-            if (curl_getinfo($this->curl, CURLINFO_HTTP_CODE) === 400) {
-                return false;
-            }
+        curl_reset($this->curl);
+        $opts = $this->buildCurl($this->opts['url'].'/api/v1/connect', [
+            'node_index' => $this->provider->nodeIndex(),
+            'build_id' => $this->provider->buildID(),
+        ]);
+        curl_setopt_array($this->curl, $opts);
 
-            // $response = $this->client
-            //     ->post('/api/v1/connect', [
-            //         'json' => [
-            //             'node_index' => $this->provider->nodeIndex(),
-            //             'build_id' => $this->provider->buildID(),
-            //         ]
-            //     ]);
-            //
-            // $body = (string) $response->getBody();
-            $json = json_decode($body, true);
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                throw new Exception(sprintf('Failed to decode json response body. Response: %s', $body));
-            }
-            return $json;
-        } catch (ClientException $e) {
-            switch ($e->getResponse()->getStatusCode()) {
-                case 400:
-                    // no build is running
-                    return false;
-                case 422:
-                    // validation error
-                    throw $e;
-                default:
-                    throw $e;
-            }
+        $body = curl_exec($this->curl);
+
+        $this->handleErrors();
+
+        if (curl_getinfo($this->curl, CURLINFO_HTTP_CODE) === 400) {
+            return false;
         }
 
-        return false;
+        $json = json_decode($body, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new Exception(sprintf('Failed to decode json response body. Response: %s', $body));
+        }
+
+        return $json;
     }
 
     /**
@@ -90,9 +66,7 @@ class API
     public function import($tests)
     {
         curl_reset($this->curl);
-        curl_setopt($this->curl, CURLOPT_URL, $_SERVER['THINGY_BASE_URL'].'/api/v1/import');
-        curl_setopt($this->curl, CURLOPT_POST, true);
-        curl_setopt($this->curl, CURLOPT_POSTFIELDS, json_encode([
+        $opts = $this->buildCurl($this->opts['url'].'/api/v1/import', [
             'commit' => $this->provider->commit(),
             'message' => $this->provider->message(),
             'branch' => $this->provider->branch(),
@@ -100,25 +74,13 @@ class API
             'node_index' => $this->provider->nodeIndex(),
             'build_id' => $this->provider->buildID(),
             'tests' => $tests,
-        ]));
-        curl_setopt($this->curl, CURLOPT_HTTPHEADER, ['Content-Type:application/json', 'Authorization:Bearer '.$_SERVER['THINGY_API_TOKEN'], 'Accept:application/json']);
-        curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, true );
+        ]);
+        curl_setopt_array($this->curl, $opts);
+
         $body = curl_exec($this->curl);
-        curl_close($this->curl);
-        // $response = $this->client
-        //     ->post('/api/v1/import', [
-        //         'json' => [
-        //             'commit' => $this->provider->commit(),
-        //             'message' => $this->provider->message(),
-        //             'branch' => $this->provider->branch(),
-        //             'node_count' => $this->provider->nodeCount(),
-        //             'node_index' => $this->provider->nodeIndex(),
-        //             'build_id' => $this->provider->buildID(),
-        //             'tests' => $tests,
-        //         ]
-        //     ]);
-        //
-        // $body = (string) $response->getBody();
+
+        $this->handleErrors();
+
         $json = json_decode($body, true);
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new Exception(sprintf('Failed to decode json response body. Response: %s', $body));
@@ -130,29 +92,49 @@ class API
     public function queue()
     {
         curl_reset($this->curl);
-        curl_setopt($this->curl, CURLOPT_URL, $_SERVER['THINGY_BASE_URL'].'/api/v1/queue');
-        curl_setopt($this->curl, CURLOPT_POST, true);
-        curl_setopt($this->curl, CURLOPT_POSTFIELDS, json_encode([
+        $opts = $this->buildCurl($this->opts['url'].'/api/v1/queue', [
             'build_id' => $this->provider->buildID(),
-        ]));
-        curl_setopt($this->curl, CURLOPT_HTTPHEADER, ['Content-Type:application/json', 'Authorization:Bearer '.$_SERVER['THINGY_API_TOKEN'], 'Accept:application/json']);
-        curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, true );
+        ]);
+        curl_setopt_array($this->curl, $opts);
+
         $body = curl_exec($this->curl);
-        curl_close($this->curl);
-        // $response = $this->client
-        //     ->post('/api/v1/queue', [
-        //         'json' => [
-        //             'build_id' => $this->provider->buildID(),
-        //         ]
-        //     ]);
-        //
-        // $body = (string) $response->getBody();
+
+        $this->handleErrors();
+
         $json = json_decode($body, true);
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new Exception(sprintf('Failed to decode json response body. Response: %s', $body));
         }
-        // TODO: catch exceptions
 
         return $json;
+    }
+
+    protected function buildCurl(string $url, array $body)
+    {
+        return [
+            CURLOPT_HTTPHEADER => [
+                'Content-Type:application/json',
+                'Authorization:Bearer '.$this->opts['api_token'],
+                'Accept:application/json',
+                'User-Agent:client+php version', // TODO
+            ],
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => json_encode($body),
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_URL => $url,
+        ];
+    }
+
+    protected function handleErrors()
+    {
+        $statusCode = curl_getinfo($this->curl, CURLINFO_HTTP_CODE);
+        switch ($statusCode) {
+            case 401:
+                throw new Exception('Unauthorized', $statusCode);
+            case 403:
+                throw new Exception('Forbidden', $statusCode);
+            case 200:
+                return;
+        }
     }
 }

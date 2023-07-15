@@ -8,12 +8,14 @@ use ThingyClient\API;
 
 class SuccessPathTest extends TestCase
 {
-    use HasHttpClient;
-
     public function test_first_node_success_path()
     {
         $tests = ['abc.php', 'def.php', 'ghi.php', 'jkl.php'];
-        $api = new API($this->client(), new NullProvider((string)random_int(1, PHP_INT_MAX)));
+        $opts = [
+            'url' => $_SERVER['TEST_BASE_URL'],
+            'api_token' => $_SERVER['TEST_API_TOKEN'],
+        ];
+        $api = new API(new NullProvider((string)random_int(1, PHP_INT_MAX)), $opts);
 
         // trying to connect to a build that hasnt been imported yet should return false
         $response = $api->connect();
@@ -35,28 +37,36 @@ class SuccessPathTest extends TestCase
     public function test_second_node_success_path()
     {
         $tests = ['abc.php', 'def.php', 'ghi.php', 'jkl.php'];
-        $api = new API($this->client(), new NullProvider((string)random_int(1, PHP_INT_MAX)));
+        $opts = [
+            'url' => $_SERVER['TEST_BASE_URL'],
+            'api_token' => $_SERVER['TEST_API_TOKEN'],
+        ];
+        $api = new API(new NullProvider((string)random_int(1, PHP_INT_MAX)), $opts);
 
         // import a new build and expect it to return some tests
         $response = $api->import($tests);
         $this->assertCount(1, $response['files']);
 
         // simulate another node calling connect first. it should receive some tests
-        // $response = $api->connect();
-        // $this->assertCount(1, $response['files']);
+        $response = $api->connect();
+        $this->assertCount(1, $response['files']);
     }
 
     public function test_second_node_importing_tests()
     {
         $tests = ['abc.php', 'def.php', 'ghi.php', 'jkl.php'];
-        $api = new API($this->client(), new NullProvider((string)random_int(1, PHP_INT_MAX)));
+        $opts = [
+            'url' => $_SERVER['TEST_BASE_URL'],
+            'api_token' => $_SERVER['TEST_API_TOKEN'],
+        ];
+        $api = new API(new NullProvider((string)random_int(1, PHP_INT_MAX)), $opts);
 
         // import a new build and expect it to return some tests
         $response = $api->import($tests);
         $this->assertCount(1, $response['files']);
 
         // simulate another node calling import as well. it should not add more tests and receive some tests
-        // $response = $api->import(['xyz.php']);
-        // $this->assertCount(1, $response['files']);
+        $response = $api->import(['xyz.php']);
+        $this->assertCount(1, $response['files']);
     }
 }
