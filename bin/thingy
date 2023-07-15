@@ -2,10 +2,10 @@
 <?php
 
 use PHPUnit\TextUI\Command as TextUICommand;
-use ThingyClient\Providers\NullProvider;
-use ThingyClient\API;
-use ThingyClient\Command;
-use ThingyClient\Providers\ProviderFactory;
+use Lightspeed\Providers\NullProvider;
+use Lightspeed\API;
+use Lightspeed\Command;
+use Lightspeed\Providers\ProviderFactory;
 
 (static function () {
     // Used when this is required using composer.

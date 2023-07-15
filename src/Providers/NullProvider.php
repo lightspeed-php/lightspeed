@@ -1,8 +1,8 @@
 <?php
 
-namespace ThingyClient\Providers;
+namespace Lightspeed\Providers;
 
-use ThingyClient\Providers\Provider;
+use Lightspeed\Providers\Provider;
 
 class NullProvider implements Provider
 {

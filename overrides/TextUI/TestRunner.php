@@ -118,7 +118,7 @@ use SebastianBergmann\Comparator\Comparator;
 use SebastianBergmann\Environment\Runtime;
 use SebastianBergmann\Invoker\Invoker;
 use SebastianBergmann\Timer\Timer;
-use ThingyClient\TestRunner as ThingyClientTestRunner;
+use Lightspeed\TestRunner as LightspeedTestRunner;
 
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
@@ -160,7 +160,7 @@ final class TestRunner extends BaseTestRunner
     private $timer;
 
     /**
-     * @var ThingyClientTestRunner
+     * @var LightspeedTestRunner
      */
     private $runner;
 
@@ -175,7 +175,7 @@ final class TestRunner extends BaseTestRunner
         $this->timer              = new Timer;
     }
 
-    public function setCustomRunner(ThingyClientTestRunner $runner)
+    public function setCustomRunner(LightspeedTestRunner $runner)
     {
         $this->runner = $runner;
         return $this;

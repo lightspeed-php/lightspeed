@@ -3,8 +3,8 @@
 namespace Tests\Feature;
 
 use PHPUnit\Framework\TestCase;
-use ThingyClient\Providers\NullProvider;
-use ThingyClient\API;
+use Lightspeed\Providers\NullProvider;
+use Lightspeed\API;
 
 class SuccessPathTest extends TestCase
 {

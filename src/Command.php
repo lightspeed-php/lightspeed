@@ -1,10 +1,10 @@
 <?php
 
-namespace ThingyClient;
+namespace Lightspeed;
 
 use PHPUnit\TextUI\Command as BaseCommand;
 use PHPUnit\TextUI\TestRunner;
-use ThingyClient\TestRunner as ThingyClientTestRunner;
+use Lightspeed\TestRunner as LightspeedTestRunner;
 
 class Command extends BaseCommand
 {
@@ -20,7 +20,7 @@ class Command extends BaseCommand
      */
     protected function createRunner(): TestRunner
     {
-        $customRunner = new ThingyClientTestRunner($this->api);
+        $customRunner = new LightspeedTestRunner($this->api);
         $testRunner = new TestRunner($this->arguments['loader']);
         $testRunner->setCustomRunner($customRunner);
 

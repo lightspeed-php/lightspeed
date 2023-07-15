@@ -5,8 +5,8 @@ namespace Tests\Unit;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\TestResult;
 use PHPUnit\Framework\TestSuite;
-use ThingyClient\API;
-use ThingyClient\TestRunner;
+use Lightspeed\API;
+use Lightspeed\TestRunner;
 
 class TestRunnerTest extends TestCase
 {

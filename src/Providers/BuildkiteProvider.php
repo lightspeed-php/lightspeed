@@ -1,6 +1,6 @@
 <?php
 
-namespace ThingyClient\Providers;
+namespace Lightspeed\Providers;
 
 class BuildkiteProvider implements Provider
 {

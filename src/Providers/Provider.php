@@ -1,6 +1,6 @@
 <?php
 
-namespace ThingyClient\Providers;
+namespace Lightspeed\Providers;
 
 interface Provider
 {

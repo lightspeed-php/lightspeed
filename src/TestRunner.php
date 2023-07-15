@@ -1,6 +1,6 @@
 <?php
 
-namespace ThingyClient;
+namespace Lightspeed;
 
 use PHPUnit\Framework\Reorderable;
 use PHPUnit\Framework\Test;

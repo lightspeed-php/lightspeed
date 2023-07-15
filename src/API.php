@@ -1,11 +1,11 @@
 <?php
 
-namespace ThingyClient;
+namespace Lightspeed;
 
 use CurlHandle;
 use Exception;
 use GuzzleHttp\Exception\ClientException;
-use ThingyClient\Providers\Provider;
+use Lightspeed\Providers\Provider;
 
 class API
 {
