@@ -4,7 +4,7 @@ namespace Tests\Feature;
 
 use Exception;
 use PHPUnit\Framework\TestCase;
-use Tests\Fixtures\NullProvider;
+use ThingyClient\Providers\NullProvider;
 use ThingyClient\API;
 
 class APIAuthenticationTest extends TestCase
