@@ -8,11 +8,11 @@ use Lightspeed\TestRunner as LightspeedTestRunner;
 
 class Command extends BaseCommand
 {
-    private API $api;
+    private LightspeedTestRunner $runner;
 
-    public function __construct(API $api)
+    public function __construct(LightspeedTestRunner $runner)
     {
-        $this->api = $api;
+        $this->runner = $runner;
     }
 
     /**
@@ -20,9 +20,8 @@ class Command extends BaseCommand
      */
     protected function createRunner(): TestRunner
     {
-        $customRunner = new LightspeedTestRunner($this->api);
         $testRunner = new TestRunner($this->arguments['loader']);
-        $testRunner->setCustomRunner($customRunner);
+        $testRunner->setCustomRunner($this->runner);
 
         return $testRunner;
     }

@@ -5,6 +5,7 @@ use PHPUnit\TextUI\Command as TextUICommand;
 use Lightspeed\API;
 use Lightspeed\Command;
 use Lightspeed\Providers\ProviderFactory;
+use Lightspeed\TestRunner;
 
 (static function () {
     // Used when this is required using composer.
@@ -15,8 +16,10 @@ use Lightspeed\Providers\ProviderFactory;
 
     if (file_exists($vendorPath)) {
         include_once $vendorPath;
+        $autoloadPath = $vendorPath;
     } else {
         include_once $localPath;
+        $autoloadPath = $localPath;
     }
 
     $provider = ProviderFactory::resolveProvider();
@@ -35,7 +38,21 @@ use Lightspeed\Providers\ProviderFactory;
         'url' => $_SERVER['LIGHTSPEED_BASE_URL'],
         'api_token' => $_SERVER['LIGHTSPEED_API_TOKEN'],
     ];
-    $command = new Command(new Api($provider, $opts));
+    $api = new Api($provider, $opts);
+    $testRunner = new TestRunner($api);
 
-    $command->run($_SERVER['argv']);
+    // detect if pest is present and use that instead
+    if (class_exists(\Pest\Support\Container::class)) {
+        require_once __DIR__.'/../overrides/Pest/Console/Command.php';
+
+        $container = \Pest\Support\Container::getInstance();
+        $container->add(TestRunner::class, $testRunner);
+
+        $rootPath = dirname($autoloadPath, 2);
+        require_once $rootPath.'/vendor/bin/pest';
+    } else {
+        $command = new Command($testRunner);
+
+        $command->run($_SERVER['argv']);
+    }
 })();
