@@ -1,7 +1,6 @@
 #!/usr/bin/env php
 <?php
 
-use GuzzleHttp\Client;
 use PHPUnit\TextUI\Command as TextUICommand;
 use ThingyClient\Providers\NullProvider;
 use ThingyClient\API;
@@ -31,18 +30,14 @@ use ThingyClient\Providers\ProviderFactory;
         return;
     }
 
+    // require our overidden TestRunner as late as possible
     require_once __DIR__.'/../overrides/TextUI/TestRunner.php';
 
-    $client = new Client([
-        'base_uri' => $_SERVER['THINGY_BASE_URL'],
-        'headers' => [
-            'User-Agent' => 'client+php version', // TODO
-            'Authorization' => 'Bearer '. $_SERVER['THINGY_API_TOKEN'],
-            'Accept' => 'application/json',
-        ],
-    ]);
-
-    $command = new Command(new Api($client, $provider));
+    $opts = [
+        'url' => $_SERVER['THINGY_BASE_URL'],
+        'api_token' => $_SERVER['THINGY_API_TOKEN'],
+    ];
+    $command = new Command(new Api($provider, $opts));
 
     $command->run($_SERVER['argv']);
 })();
