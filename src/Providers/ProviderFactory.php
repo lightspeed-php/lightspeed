@@ -6,6 +6,7 @@ class ProviderFactory
 {
     const PROVIDERS = [
         BuildkiteProvider::class,
+        GitHubActionsProvider::class,
     ];
 
     public static function resolveProvider()
