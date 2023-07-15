@@ -38,6 +38,6 @@
         "preferred-install": "dist"
     },
     "bin": [
-        "bin/thingy"
+        "bin/lightspeed"
     ]
 }

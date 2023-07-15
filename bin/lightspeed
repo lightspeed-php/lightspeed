@@ -32,8 +32,8 @@ use Lightspeed\Providers\ProviderFactory;
     require_once __DIR__.'/../overrides/TextUI/TestRunner.php';
 
     $opts = [
-        'url' => $_SERVER['THINGY_BASE_URL'],
-        'api_token' => $_SERVER['THINGY_API_TOKEN'],
+        'url' => $_SERVER['LIGHTSPEED_BASE_URL'],
+        'api_token' => $_SERVER['LIGHTSPEED_API_TOKEN'],
     ];
     $command = new Command(new Api($provider, $opts));
 
