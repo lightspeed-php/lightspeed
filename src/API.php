@@ -48,6 +48,7 @@ class API
 
         $json = json_decode($body, true);
         if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new Exception(curl_error($this->curl));
             throw new Exception(sprintf('Failed to decode json response body. Response: %s', $body));
         }
 
