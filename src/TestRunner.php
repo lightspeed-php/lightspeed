@@ -2,8 +2,7 @@
 
 namespace Lightspeed;
 
-use PHPUnit\Framework\Reorderable;
-use PHPUnit\Framework\Test;
+use Lightspeed\Providers\Provider;
 use PHPUnit\Framework\TestResult;
 use PHPUnit\Framework\TestSuite;
 use RecursiveIteratorIterator;
@@ -11,49 +10,31 @@ use RecursiveIteratorIterator;
 class TestRunner
 {
     /**
-     * @var API
+     * @var Provider
      */
-    private $api;
+    private $provider;
 
-    /**
-     * @var array<Test|Reorderable>
-     */
-    private $tests = [];
-
-    public function __construct(API $api)
+    public function __construct(Provider $provider)
     {
-        $this->api = $api;
+        $this->provider = $provider;
     }
 
     public function run(TestSuite $suite, TestResult $result)
     {
-        // build up a map of test names to suites
+        // pull out all tests into an array
+        $tests = [];
+        $testCount = 0;
         foreach (new RecursiveIteratorIterator($suite) as $test) {
-            /** @var Reorderable $test */
-            $this->tests[$test->sortId()] = $test;
+            $tests[] = $test;
+            $testCount++;
         }
 
-        // try connect to an existing build
-        $apiResponse = $this->api->connect();
+        $sliceLength = ceil($testCount / $this->provider->nodeCount());
+        $offset = $sliceLength * $this->provider->nodeIndex();
+        $run = array_slice($tests, $offset, $sliceLength);
 
-        if ($apiResponse === false) {
-            // no existing build to join. we need to import one
-            // no tests left in the queue to run
-            $apiResponse = $this->api->import(array_keys($this->tests));
-        }
-
-        $this->recursivelyRun($apiResponse['files'], $result);
-    }
-
-    private function recursivelyRun(array &$tests, TestResult $result)
-    {
-        if (count($tests) > 0) {
-            foreach ($tests as $selectedTest) {
-                $this->tests[$selectedTest]->run($result);
-            }
-
-            $apiResponse = $this->api->queue();
-            $this->recursivelyRun($apiResponse['files'], $result);
+        foreach ($run as $test) {
+            $result = $test->run($result);
         }
     }
 }

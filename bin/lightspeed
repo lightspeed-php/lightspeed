@@ -2,7 +2,6 @@
 <?php
 
 use PHPUnit\TextUI\Command as TextUICommand;
-use Lightspeed\API;
 use Lightspeed\Command;
 use Lightspeed\Providers\ProviderFactory;
 use Lightspeed\TestRunner;
@@ -34,12 +33,7 @@ use Lightspeed\TestRunner;
     // require our overidden TestRunner as late as possible
     require_once __DIR__.'/../overrides/TextUI/TestRunner.php';
 
-    $opts = [
-        'url' => $_SERVER['LIGHTSPEED_BASE_URL'],
-        'api_token' => $_SERVER['LIGHTSPEED_API_TOKEN'],
-    ];
-    $api = new Api($provider, $opts);
-    $testRunner = new TestRunner($api);
+    $testRunner = new TestRunner($provider);
 
     // detect if pest is present and use that instead
     if (class_exists(\Pest\Support\Container::class)) {

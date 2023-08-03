@@ -6,11 +6,13 @@ use Lightspeed\Providers\Provider;
 
 class NullProvider implements Provider
 {
-    public  $buildId;
+    public int $nodeCount;
+    public int $nodeIndex;
 
-    public function __construct(string $buildId)
+    public function __construct(int $nodeCount, int $nodeIndex)
     {
-        $this->buildId = $buildId;
+        $this->nodeCount = $nodeCount;
+        $this->nodeIndex = $nodeIndex;
     }
 
     public function branch()
@@ -20,7 +22,7 @@ class NullProvider implements Provider
 
     public function buildID()
     {
-        return $this->buildId;
+        return 'abcd';
     }
 
     public function commit()
@@ -40,11 +42,11 @@ class NullProvider implements Provider
 
     public function nodeCount()
     {
-        return 2;
+        return $this->nodeCount;
     }
 
     public function nodeIndex()
     {
-        return 0;
+        return $this->nodeIndex;
     }
 }

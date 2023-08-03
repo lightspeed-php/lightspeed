@@ -5,18 +5,14 @@ namespace Tests\Unit;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\TestResult;
 use PHPUnit\Framework\TestSuite;
-use Lightspeed\API;
+use Lightspeed\Providers\NullProvider;
 use Lightspeed\TestRunner;
 
 class TestRunnerTest extends TestCase
 {
-    public function test_existing_empty_build_doesnt_run_any_tests()
+    public function test_no_tests()
     {
-        $api = $this->createMock(API::class);
-        // the api client should try connect only once
-        $api->expects($this->once())->method('connect')->willReturn(['files' => []]);
-
-        $runner =  new TestRunner($api);
+        $runner =  new TestRunner(new NullProvider(1, 0));
         $suite = $this->getMockBuilder(TestSuite::class)
             ->enableProxyingToOriginalMethods()
             ->onlyMethods(['run'])
@@ -25,84 +21,86 @@ class TestRunnerTest extends TestCase
         $suite->expects($this->never())->method('run');
         $suite->setTests([]);
 
-        $runner->run($suite, new TestResult);
+        $result = new TestResult();
+        $runner->run($suite, $result);
+        // but only one was run
+        $this->assertCount(0, $result);
     }
 
-    public function test_existing_build_runs_test_until_empty()
+    /**
+     * @dataProvider subsetOfTests
+     */
+    public function test_runs_subset_of_all_tests($totalTests, $nodeCount, $nodeIndex, $runTests)
     {
-        $api = $this->createMock(API::class);
-        // the api client should try connect only once
-        $api->expects($this->once())->method('connect')->willReturn(['files' => ['test 1']]);
-        $api->expects($this->exactly(2))->method('queue')->willReturn(['files' => ['test 2']], ['files' => []]);
-
         $suite = new TestSuite();
         $testCase = fn ($name) => new class($name) extends TestCase {
             public function sortId(): string {
                 return $this->getName();
             }
         };
-        $suite->addTest($testCase('test 1'));
-        $suite->addTest($testCase('test 2'));
-        $this->assertCount(2, $suite->tests());
+        // add all tests to the suite
+        for ($i = 0; $i < $totalTests; $i++) {
+            $suite->addTest($testCase("test $i"));
+        }
+        $this->assertCount($totalTests, $suite->tests());
 
-        $runner =  new TestRunner($api);
+        $result = new TestResult();
+        $runner =  new TestRunner(new NullProvider($nodeCount, $nodeIndex));
+        $runner->run($suite, $result);
 
-        $runner->run($suite, new TestResult);
+        // assert all tests were run
+        $this->assertCount($runTests, $result);
     }
 
-    public function test_new_empty_build_doesnt_run_any_tests()
+    public function subsetOfTests()
     {
-        $api = $this->createMock(API::class);
-        // the api client should try connect only once
-        $api->expects($this->once())->method('connect')->willReturn(false);
-        // and import only once but return no files
-        $api->expects($this->once())->method('import')->willReturn(['files' => []]);
-
-        $runner =  new TestRunner($api);
-        $suite = $this->getMockBuilder(TestSuite::class)
-            ->enableProxyingToOriginalMethods()
-            ->onlyMethods(['run'])
-            ->getMock();
-        // the test suite should never be run because the api responded with no tests
-        $suite->expects($this->never())->method('run');
-        $suite->setTests([]);
-
-        $runner->run($suite, new TestResult);
+        return [
+            // format: [total number of tests, node count, node index, expected number of run tests]
+            'node pair index 0' => [2, 2, 0, 1],
+            'node pair index 1' => [2, 2, 1, 1],
+            'odd index 0' => [3, 2, 1, 1],
+            'large even' => [148, 40, 0, 4],
+            'large odd' => [347, 7, 0, 50],
+            'large odd last index' => [347, 7, 6, 47],
+        ];
     }
 
-    public function test_new_build_runs_returned_tests_until_empty()
+    /**
+     * @dataProvider numberOfTests
+     */
+    public function test_all_tests_are_run($totalTests, $nodeCount)
     {
-        $api = $this->createMock(API::class);
-        // the api client should try connect only once
-        $api->expects($this->once())->method('connect')->willReturn(false);
-        // and call import only once with some tests
-        $api->expects($this->once())->method('import')->willReturn(['files' => ['test 1', 'test 2']]);
-        // and call queue twice returning some tests once and none the next time
-        $api->expects($this->exactly(2))->method('queue')->willReturn(['files' => ['test 3']], ['files' => []]);
-
         $suite = new TestSuite();
         $testCase = fn ($name) => new class($name) extends TestCase {
             public function sortId(): string {
                 return $this->getName();
             }
         };
-        $suite->addTest($testCase('test 1'));
-        $suite->addTest($testCase('test 2'));
-        $suite->addTest($testCase('test 3'));
-        $this->assertCount(3, $suite->tests());
+        // add all tests to the suite
+        for ($i = 0; $i < $totalTests; $i++) {
+            $suite->addTest($testCase("test $i"));
+        }
+        $this->assertCount($totalTests, $suite->tests());
 
-        $runner =  new TestRunner($api);
+        $result = new TestResult();
+        // create separate test runners to mock separate nodes
+        for ($i = 0; $i < $nodeCount; $i++) {
+            $runner =  new TestRunner(new NullProvider($nodeCount, $i));
+            $runner->run($suite, $result);
+        }
 
-        $runner->run($suite, new TestResult);
+        // assert all tests were run
+        $this->assertCount($totalTests, $result);
     }
 
-    public function test_dependency_order_works_correctly()
+    public function numberOfTests()
     {
-        $this->markTestSkipped('Need to implement a test to confirm the @depends annotation works');
-    }
-
-    public function test_dataprovider_works_correctly()
-    {
-        $this->markTestSkipped('Need to implement a test to confirm the @dataProvider annotation works');
+        return [
+            // format: [total number of tests, node count]
+            'even' => [2, 2],
+            'odd' => [3, 2],
+            'large even' => [148, 40],
+            'large odd' => [347, 7],
+        ];
     }
 }

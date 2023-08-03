@@ -7,9 +7,6 @@
         <testsuite name="unit">
             <directory suffix=".php">./tests/Unit</directory>
         </testsuite>
-        <testsuite name="feature">
-            <directory suffix=".php">./tests/Feature</directory>
-        </testsuite>
     </testsuites>
     <coverage processUncoveredFiles="true">
         <include>
