@@ -33,8 +33,16 @@ class TestRunner
         $offset = $sliceLength * $this->provider->nodeIndex();
         $run = array_slice($tests, $offset, $sliceLength);
 
+        $result->startTestSuite($suite);
+
         foreach ($run as $test) {
-            $result = $test->run($result);
+            if ($result->shouldStop()) {
+                break;
+            }
+
+            $test->run($result);
         }
+
+        $result->endTestSuite($suite);
     }
 }
