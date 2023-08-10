@@ -6,8 +6,8 @@ use Lightspeed\Providers\Provider;
 
 class NullProvider implements Provider
 {
-    public int $nodeCount;
-    public int $nodeIndex;
+    public $nodeCount;
+    public $nodeIndex;
 
     public function __construct(int $nodeCount, int $nodeIndex)
     {
