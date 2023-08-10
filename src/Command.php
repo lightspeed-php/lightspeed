@@ -8,7 +8,8 @@ use Lightspeed\TestRunner as LightspeedTestRunner;
 
 class Command extends BaseCommand
 {
-    private LightspeedTestRunner $runner;
+    /** @var LightspeedTestRunner */
+    private $runner;
 
     public function __construct(LightspeedTestRunner $runner)
     {
