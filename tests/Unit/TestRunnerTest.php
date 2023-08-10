@@ -33,14 +33,9 @@ class TestRunnerTest extends TestCase
     public function test_runs_subset_of_all_tests($totalTests, $nodeCount, $nodeIndex, $runTests)
     {
         $suite = new TestSuite();
-        $testCase = fn ($name) => new class($name) extends TestCase {
-            public function sortId(): string {
-                return $this->getName();
-            }
-        };
         // add all tests to the suite
         for ($i = 0; $i < $totalTests; $i++) {
-            $suite->addTest($testCase("test $i"));
+            $suite->addTest($this->newTestCaseClass("test $i"));
         }
         $this->assertCount($totalTests, $suite->tests());
 
@@ -71,14 +66,9 @@ class TestRunnerTest extends TestCase
     public function test_all_tests_are_run($totalTests, $nodeCount)
     {
         $suite = new TestSuite();
-        $testCase = fn ($name) => new class($name) extends TestCase {
-            public function sortId(): string {
-                return $this->getName();
-            }
-        };
         // add all tests to the suite
         for ($i = 0; $i < $totalTests; $i++) {
-            $suite->addTest($testCase("test $i"));
+            $suite->addTest($this->newTestCaseClass("test $i"));
         }
         $this->assertCount($totalTests, $suite->tests());
 
@@ -102,5 +92,14 @@ class TestRunnerTest extends TestCase
             'large even' => [148, 40],
             'large odd' => [347, 7],
         ];
+    }
+
+    private function newTestCaseClass($name)
+    {
+        return new class($name) extends TestCase {
+            public function sortId(): string {
+                return $this->getName();
+            }
+        };
     }
 }
