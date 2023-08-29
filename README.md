@@ -62,6 +62,19 @@ jobs:
 Buildkite is supported out of the box by setting the `parallelism` command step attribute. You can parallelise your
 test steps with as much agents as you can to minimise test time.
 
+```yaml
+steps:
+  - label: ':php: Run tests'
+    commands:
+      - composer update --no-interaction --no-progress
+      - php vendor/bin/lightspeed
+    parallelism: 3
+    plugins:
+      - docker#v4.14.0:
+          image: composer:2
+          propagate-environment: true
+```
+
 ## License
 
 Lightspeed is licensed under the BSD 4-Clause License.
