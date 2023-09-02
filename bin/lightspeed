@@ -20,30 +20,42 @@ use Lightspeed\TestRunner;
         include_once $localPath;
         $autoloadPath = $localPath;
     }
+    $rootPath = dirname($autoloadPath, 2);
+
+    $hasPest = class_exists(\Pest\Support\Container::class);
+    $hasParatest = class_exists(\ParaTest\Console\Commands\ParaTestCommand::class);
 
     $provider = ProviderFactory::resolveProvider();
 
     // if no provider is found, we aren't running in CI so run as vanilla phpunit
     if ($provider === false) {
+        if ($hasPest) {
+            require_once $rootPath . '/vendor/bin/pest';
+        } else if ($hasParatest) {
+            require_once $rootPath . '/vendor/bin/paratest';
+        }
         $command = new TextUICommand();
         $command->run($_SERVER['argv']);
         return;
     }
 
     // require our overidden TestRunner as late as possible
-    require_once __DIR__.'/../overrides/TextUI/TestRunner.php';
+    require_once __DIR__ . '/../overrides/TextUI/TestRunner.php';
 
     $testRunner = new TestRunner($provider);
 
     // detect if pest is present and use that instead
-    if (class_exists(\Pest\Support\Container::class)) {
+    if ($hasPest) {
         require_once __DIR__.'/../overrides/Pest/Console/Command.php';
 
         $container = \Pest\Support\Container::getInstance();
         $container->add(TestRunner::class, $testRunner);
 
-        $rootPath = dirname($autoloadPath, 2);
-        require_once $rootPath.'/vendor/bin/pest';
+        require_once $rootPath . '/vendor/bin/pest';
+    } else if ($hasParatest) { // or if paratest is present use that
+        require_once __DIR__ . '/../overrides/ParaTest/Runners/PHPUnit/BaseRunner.php';
+
+        require_once $rootPath . '/vendor/bin/paratest';
     } else {
         $command = new Command($testRunner);
 
