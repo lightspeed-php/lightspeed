@@ -18,7 +18,9 @@
     ],
     "require": {
         "php": "^7.3 || ^8.0",
-        "phpunit/phpunit": "^9.5"
+        "phpunit/phpunit": "^9.5",
+        "symfony/polyfill-php80": "^1.28",
+        "symfony/process": "^5.0 || ^6.0"
     },
     "autoload": {
         "psr-4": {
@@ -30,7 +32,14 @@
             "Tests\\": "tests/"
         }
     },
-    "minimum-stability": "stable",
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Lightspeed\\LightspeedServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
     "prefer-stable": true,
     "config": {
         "sort-packages": true,
@@ -38,5 +47,10 @@
     },
     "bin": [
         "bin/lightspeed"
-    ]
+    ],
+    "require-dev": {
+        "illuminate/support": "^9.0",
+        "nunomaduro/collision": "^7.9",
+        "orchestra/testbench": "^7.32"
+    }
 }

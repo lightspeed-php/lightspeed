@@ -8,10 +8,10 @@ use Lightspeed\TestRunner;
 
 (static function () {
     // Used when this is required using composer.
-    $vendorPath = dirname(__DIR__, 4).'/vendor/autoload.php';
+    $vendorPath = dirname(__DIR__, 4) . '/vendor/autoload.php';
 
     // Used when maintainers are running tests.
-    $localPath = dirname(__DIR__).'/vendor/autoload.php';
+    $localPath = dirname(__DIR__) . '/vendor/autoload.php';
 
     if (file_exists($vendorPath)) {
         include_once $vendorPath;
@@ -22,8 +22,7 @@ use Lightspeed\TestRunner;
     }
     $rootPath = dirname($autoloadPath, 2);
 
-    $hasPest = class_exists(\Pest\Support\Container::class);
-    $hasParatest = class_exists(\ParaTest\Console\Commands\ParaTestCommand::class);
+    $hasPest = class_exists(\Pest\Laravel\PestServiceProvider::class);
 
     $provider = ProviderFactory::resolveProvider();
 
@@ -31,8 +30,6 @@ use Lightspeed\TestRunner;
     if ($provider === false) {
         if ($hasPest) {
             require_once $rootPath . '/vendor/bin/pest';
-        } else if ($hasParatest) {
-            require_once $rootPath . '/vendor/bin/paratest';
         }
         $command = new TextUICommand();
         $command->run($_SERVER['argv']);
@@ -46,16 +43,12 @@ use Lightspeed\TestRunner;
 
     // detect if pest is present and use that instead
     if ($hasPest) {
-        require_once __DIR__.'/../overrides/Pest/Console/Command.php';
+        require_once __DIR__ . '/../overrides/Pest/Console/Command.php';
 
         $container = \Pest\Support\Container::getInstance();
         $container->add(TestRunner::class, $testRunner);
 
         require_once $rootPath . '/vendor/bin/pest';
-    } else if ($hasParatest) { // or if paratest is present use that
-        require_once __DIR__ . '/../overrides/ParaTest/Runners/PHPUnit/BaseRunner.php';
-
-        require_once $rootPath . '/vendor/bin/paratest';
     } else {
         $command = new Command($testRunner);
 
