@@ -52,12 +52,42 @@ class TestCommand extends CommandsTestCommand
     }
 
     /**
+     * Get the array of environment variables common to all runners.
+     *
+     * @return array
+     */
+    protected function commonEnvironmentVariables()
+    {
+        return [
+            'BUILDKITE_BRANCH' => $_SERVER['BUILDKITE_BRANCH'],
+            'BUILDKITE_BUILD_NUMBER' => $_SERVER['BUILDKITE_BUILD_NUMBER'],
+            'BUILDKITE_COMMIT' => $_SERVER['BUILDKITE_COMMIT'],
+            'BUILDKITE' => $_SERVER['BUILDKITE'],
+            'BUILDKITE_MESSAGE' => $_SERVER['BUILDKITE_MESSAGE'],
+            'BUILDKITE_PARALLEL_JOB_COUNT' => $_SERVER['BUILDKITE_PARALLEL_JOB_COUNT'],
+            'BUILDKITE_PARALLEL_JOB' => $_SERVER['BUILDKITE_PARALLEL_JOB'],
+        ];
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function phpunitEnvironmentVariables()
     {
         return array_merge(
+            $this->commonEnvironmentVariables(),
             parent::phpunitEnvironmentVariables(),
+            parent::paratestEnvironmentVariables()
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function paratestEnvironmentVariables()
+    {
+        return array_merge(
+            $this->commonEnvironmentVariables(),
             parent::paratestEnvironmentVariables()
         );
     }
